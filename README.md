@@ -1,13 +1,3 @@
-# TP 3 - Composants
-
-### LAST NAME : DOE
-### First name : John
-### TP group : 
-- [ ] TPA41
-- [ ] TPA42
-- [ ] TPA51
-- [ ] TPA52
-- [x] Not selected
 
 
 
