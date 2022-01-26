@@ -14,7 +14,8 @@
 
     <!-- image pendu -->
     <br/>
-    <img :src =  'tab_img_pendu[pendu]'/>
+    <img :src =  comp_image />
+    {{pendu}}
     <br/>
 
     <div id = "saisie">
@@ -29,7 +30,14 @@
       {{tab_langue[2][langue_maternelle]}}
       <input type="text" v-model="lettre_courante" v-on:keyup.enter="nouvelle_lettre" maxlength="1"/>
       <input type="button" @click="nouvelle_lettre"  value="ok"/>
+      <br/>
+      <br/>
+      <!--saisie mot -->
+      proposer une solution
+      <input type="text" v-model="mot_tentative" v-on:keyup.enter="proposition" maxlength=this.mot.mot.length/>
+      <input type="button" @click="proposition"  value="ok"/>
      </div>
+
 
   </div>
 </template>
@@ -38,13 +46,14 @@
 export default {
   name: "pendu",
   props: {
-    mot: {
-      type: Object,
+    dif: {
+      type: Number,
     }
   },
 
   data: function () {
     return {
+      mot : "lemot",
       //[ [ français anglais espagnol ],[ français anglais espagnol ] ]
       tab_langue: [ ["pendu","hangman","ahorcado"],
                     ["lettres déjà utilisées :","letters already used","letras ya usadas"],
@@ -52,50 +61,73 @@ export default {
                   ],
       langue_maternelle : 0,
       langue_travail : 1,
-      tab_img_pendu : [
-        "https://www.checkyoursmile.fr/images/jeux/hangman/pic_0.png",
-        "https://www.checkyoursmile.fr/images/jeux/hangman/pic_1.png",
-        "https://www.checkyoursmile.fr/images/jeux/hangman/pic_2.png",
-        "https://www.checkyoursmile.fr/images/jeux/hangman/pic_3.png",
-        "https://www.checkyoursmile.fr/images/jeux/hangman/pic_4.png",
-        "https://www.checkyoursmile.fr/images/jeux/hangman/pic_5.png",
-        "https://www.checkyoursmile.fr/images/jeux/hangman/pic_6.png",
-        "https://www.checkyoursmile.fr/images/jeux/hangman/pic_7.png"
-      ],
       lettres : [] ,
       lettre_courante : '' ,
       nb_essai : 7,
       essai : 0,
       pendu : 0,
-      mot_en_construction: new Array(this.mot.mot.length).fill("_"),
+      mot_en_construction:[],
       nb_lettres_valides : 0,
+      mot_tentative : ""
+    }
+  },
+
+  computed:{
+    comp_image : function(){
+      return "https://www.checkyoursmile.fr/images/jeux/hangman/pic_" + this.pendu + ".png";
     }
   },
 
   methods: {
     nouvelle_lettre: function(){
-      let i_lettre = this.mot.mot.indexOf(this.lettre_courante)
-      console.log(i_lettre);
-      if ( i_lettre != -1) {
-        this.mot_en_construction[i_lettre] = this.lettre_courante;
-        this.nb_lettres_valides++;
-        console.log(this.mot.mot.charAt(i_lettre));
-      }else{
-        this.pendu ++;
-      }
-      this.lettres.push(this.lettre_courante)
-      this.essai ++;
-      this.lettre_courante = '';
+      if(this.lettre_courante != "") {
+        let i_lettre = this.mot.indexOf(this.lettre_courante)
+        console.log(i_lettre);
+        if (i_lettre != -1) {
+          this.mot_en_construction[i_lettre] = this.lettre_courante;
+          this.nb_lettres_valides++;
+          console.log(this.mot.charAt(i_lettre));
+        } else {
+          this.pendu++;
+        }
+        this.lettres.push(this.lettre_courante)
+        this.essai++;
+        this.lettre_courante = '';
 
+        this.fin();
+      }
+    },
+
+    fin: function(){
       //fin de partie
-      if(this.pendu >= this.mot.diff){
+      if(this.pendu >= this.dif){
         console.log("fin perdu");
       }
-      if( this.nb_lettres_valides == this.mot.mot.length){
+      if( this.nb_lettres_valides == this.mot.length){
         console.log("fin gagné");
       }
+    },
+
+
+
+
+    proposition: function(){
+      if (this.mot_tentative === this.mot){
+        console.log("fin gagné");
+      }
+      else{
+        this.pendu ++;
+        console.log("nop");
+      }
+      this.mot_tentative = "";
     }
   },
+
+  mounted() {
+    this.mot_en_construction = this.mot.length*["_"];
+  },
+
+
 }
 </script>
 
